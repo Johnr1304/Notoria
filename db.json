@@ -1,0 +1,177 @@
+{
+  "users": [
+    {
+      "id": "MFzSvK9Glic",
+      "name": "text",
+      "email": "text@gmail.com",
+      "password": "text@12ex"
+    },
+    {
+      "id": "h-dY1zRu5WY",
+      "name": "text12",
+      "email": "text12@gmail.com",
+      "password": "text12@12"
+    }
+  ],
+  "notes": [
+    {
+      "id": "1",
+      "title": "React Interview",
+      "content": "Revise Hooks, Routing and Context API.",
+      "tag": "Study",
+      "color": "#FEF3C7",
+      "pinned": true,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "10 Jul 2026",
+      "userId": "MFzSvK9Glic"
+    },
+    {
+      "id": "2",
+      "title": "Shopping List",
+      "content": "Milk, Bread, Eggs, Butter",
+      "tag": "Personal",
+      "color": "#DBEAFF",
+      "pinned": false,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "10 Jul 2026",
+      "userId": "MFzSvK9Glic"
+    },
+    {
+      "id": "3",
+      "title": "Project Ideas",
+      "content": "Complete Notoria using React and Tailwind.",
+      "tag": "Development",
+      "color": "#DCECE7",
+      "pinned": true,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "09 Jul 2026",
+      "userId": "MFzSvK9Glic"
+    },
+    {
+      "id": "4",
+      "title": "Travel Plan",
+      "content": "Book hotel, train tickets and prepare packing list.",
+      "tag": "Travel",
+      "color": "#F3F8FF",
+      "pinned": false,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "08 Jul 2026",
+      "userId": "MFzSvK9Glic"
+    },
+    {
+      "title": "What's Today's Plan",
+      "content": "Let's Plan Our Day \n                      \n",
+      "tag": "Have To Be Noted",
+      "color": "#EEF2FF",
+      "pinned": false,
+      "archived": false,
+      "trashed": true,
+      "updatedAt": "7/14/2026, 12:39:41 AM",
+      "userId": "h-dY1zRu5WY",
+      "id": "0XIMI-9tNas"
+    },
+    {
+      "title": "rf",
+      "content": "sr",
+      "tag": "rhrs",
+      "color": "#EEF2FF",
+      "pinned": false,
+      "archived": false,
+      "trashed": true,
+      "updatedAt": "7/14/2026, 1:19:25 AM",
+      "userId": "h-dY1zRu5WY",
+      "id": "rT1YqL6RIrM"
+    },
+    {
+      "title": "gr",
+      "content": "rah",
+      "tag": "etreha",
+      "color": "#EEF2FF",
+      "pinned": false,
+      "archived": false,
+      "updatedAt": "7/14/2026, 1:33:58 AM",
+      "userId": "h-dY1zRu5WY",
+      "trashed": true,
+      "id": "b5U7dIXlYkQ"
+    },
+    {
+      "title": "tder",
+      "content": "hrzedhu",
+      "tag": "srf",
+      "color": "#FFF7ED",
+      "pinned": false,
+      "archived": false,
+      "trashed": true,
+      "updatedAt": "7/16/2026, 4:39:22 PM",
+      "userId": "h-dY1zRu5WY",
+      "id": "MnfkCVVfhUU"
+    },
+    {
+      "title": "rhsfh",
+      "content": "srh",
+      "tag": "zdtr",
+      "color": "#FBCFE8",
+      "pinned": false,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "7/16/2026, 8:17:27 PM",
+      "userId": "h-dY1zRu5WY",
+      "id": "koSlamz6dZQ"
+    },
+    {
+      "title": "rs",
+      "content": "tzjjykdav",
+      "tag": "htjz",
+      "color": "#FDF2F8",
+      "pinned": false,
+      "archived": false,
+      "trashed": true,
+      "updatedAt": "7/16/2026, 8:13:23 PM",
+      "userId": "h-dY1zRu5WY",
+      "id": "1llz9y08NCg"
+    },
+    {
+      "title": "Assignment Task Overview",
+      "content": "The Notes Keeper – Smart Notes Organizer is a responsive web application built using the MERN stack that allows users to create, organise, search, and manage their personal notes efficiently. The platform supports rich-text note editing, enabling users to format their notes with headings, bullet points, and highlights, making it suitable for everything from quick reminders to detailed study notes.",
+      "tag": "ENTRI",
+      "color": "#EFF6FF",
+      "pinned": true,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "7/14/2026, 1:43:44 AM",
+      "userId": "h-dY1zRu5WY",
+      "id": "pKdQs4vkJFA"
+    },
+    {
+      "title": "fs",
+      "content": "dfbS",
+      "tag": "dg",
+      "color": "#EEF2FF",
+      "pinned": false,
+      "archived": false,
+      "trashed": true,
+      "updatedAt": "7/16/2026, 5:14:59 PM",
+      "userId": "h-dY1zRu5WY",
+      "id": "B9yTkIUtMiE"
+    },
+    {
+      "title": "eqrf",
+      "content": "we",
+      "tag": "ewr",
+      "color": "#FFF7E6",
+      "pinned": false,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "7/16/2026, 8:13:13 PM",
+      "userId": "h-dY1zRu5WY",
+      "id": "3_p7iCTYKAU"
+    }
+  ],
+  "notebooks": [],
+  "tags": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}
