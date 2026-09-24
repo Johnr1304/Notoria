@@ -8,20 +8,26 @@ import Notebook from "./pages/Notebook";
 import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import Tags from "./pages/Tags";
+import Trash from "./pages/Trash";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
+
+        {/* Login */}
 
         <Route path="/" element={<Login />} />
 
         <Route path="/login" element={<Login />} />
 
+        {/* Signup */}
+
         <Route path="/signup" element={<Signup />} />
+
+        {/* Dashboard */}
 
         <Route
           path="/dashboard"
@@ -32,6 +38,8 @@ function App() {
           }
         />
 
+        {/* Archive */}
+
         <Route
           path="/archive"
           element={
@@ -40,6 +48,19 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Notebooks */}
+
+        <Route
+          path="/notebooks"
+          element={
+            <ProtectedRoute>
+              <Notebook />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Individual Notebook */}
 
         <Route
           path="/notebook/:id"
@@ -50,16 +71,42 @@ function App() {
           }
         />
 
+        {/* Tags */}
+
+        <Route
+          path="/tags"
+          element={
+            <ProtectedRoute>
+              <Tags />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Settings */}
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Not Found */}
+
         <Route path="*" element={<NotFound />} />
 
-        <Route path="/settings"element={<Settings/>} />
-
-        <Route path="/tags" element={<Tags />} />
-
-        
+        <Route
+         path="/trash"
+         element={
+         <ProtectedRoute>
+         <Trash />
+         </ProtectedRoute>
+  }
+/>
 
       </Routes>
-
     </BrowserRouter>
   );
 }

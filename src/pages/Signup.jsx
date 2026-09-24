@@ -30,44 +30,40 @@ function Signup() {
   };
 
   const handleSignup = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const { name, email, password, confirmPassword } = formData;
+    const { name, email, password, confirmPassword } = formData;
 
-  if (!name || !email || !password || !confirmPassword) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
-
-  try {
-    // Check if email already exists
-    const res = await api.get(`/users?email=${email}`);
-
-    if (res.data.length > 0) {
-      alert("Email already exists");
+    if (!name || !email || !password || !confirmPassword) {
+      alert("Please fill all fields");
       return;
     }
 
-    // Save new user
-    await api.post("/users", {
-      name,
-      email,
-      password,
-    });
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
-    alert("Account Created Successfully!");
+    try {
+      const res = await api.post("/auth/signup", {
+        name,
+        email,
+        password,
+      });
 
-    navigate("/login");
-  } catch (err) {
-    console.log(err);
-    alert("Something went wrong");
-  }
-};
+      alert(res.data.message || "Account Created Successfully!");
+
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+
+      if (err.response) {
+        alert(err.response.data.message || "Signup failed");
+      } else {
+        alert("Unable to connect to the server");
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen flex">

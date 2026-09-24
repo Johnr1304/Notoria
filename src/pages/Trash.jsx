@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
-  Archive,
-  RotateCcw,
   Trash2,
-  FileArchive,
+  RotateCcw,
+  FileX2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-function ArchivePage() {
+function Trash() {
   const navigate = useNavigate();
 
   const [notes, setNotes] = useState([]);
@@ -18,7 +17,7 @@ function ArchivePage() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const fetchArchivedNotes = async () => {
+    const fetchTrash = async () => {
       try {
         if (!token) {
           navigate("/login");
@@ -31,19 +30,18 @@ function ArchivePage() {
           },
         });
 
-        const archivedNotes = (
+        const trashedNotes = (
           res.data.notes || []
         ).filter(
           (note) =>
-            note.archived === true &&
-            note.trashed !== true &&
-            note.trashed !== "true"
+            note.trashed === true ||
+            note.trashed === "true"
         );
 
-        setNotes(archivedNotes);
+        setNotes(trashedNotes);
       } catch (error) {
         console.error(
-          "Error fetching archived notes:",
+          "Error fetching trash:",
           error
         );
 
@@ -59,14 +57,14 @@ function ArchivePage() {
       }
     };
 
-    fetchArchivedNotes();
+    fetchTrash();
   }, [navigate, token]);
 
-  const unarchiveNote = async (id) => {
+  const restoreNote = async (id) => {
     try {
       await api.put(
         `/notes/${id}`,
-        { archived: false },
+        { trashed: false },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,28 +76,30 @@ function ArchivePage() {
         prevNotes.filter((note) => note._id !== id)
       );
     } catch (error) {
-      console.error("Unarchive Error:", error);
+      console.error("Restore Error:", error);
     }
   };
 
-  const moveToTrash = async (id) => {
+  const deleteForever = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to permanently delete this note?"
+    );
+
+    if (!confirmDelete) return;
+
     try {
-      await api.put(
-        `/notes/${id}`,
-        { trashed: true },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.delete(`/notes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setNotes((prevNotes) =>
         prevNotes.filter((note) => note._id !== id)
       );
     } catch (error) {
       console.error(
-        "Move To Trash Error:",
+        "Permanent Delete Error:",
         error
       );
     }
@@ -125,11 +125,11 @@ function ArchivePage() {
 
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-            Archive
+            Trash
           </h1>
 
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Notes you have archived
+            Notes you have moved to trash
           </p>
         </div>
 
@@ -142,17 +142,17 @@ function ArchivePage() {
 
         <div className="flex items-center gap-4">
 
-          <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
-            <FileArchive
+          <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
+            <FileX2
               size={24}
-              className="text-indigo-600"
+              className="text-red-600"
             />
           </div>
 
           <div>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Archived Notes
+              Notes in Trash
             </p>
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -170,7 +170,7 @@ function ArchivePage() {
 
       {loading && (
         <p className="text-gray-500 dark:text-gray-400">
-          Loading archived notes...
+          Loading trash...
         </p>
       )}
 
@@ -180,24 +180,24 @@ function ArchivePage() {
       {!loading && notes.length === 0 && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-10 sm:p-14 text-center border border-gray-200 dark:border-slate-800">
 
-          <Archive
+          <Trash2
             size={55}
             className="mx-auto text-gray-400"
           />
 
           <h2 className="text-2xl sm:text-3xl font-bold mt-5 text-gray-800 dark:text-white">
-            No Archived Notes
+            Trash is Empty
           </h2>
 
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Notes that you archive will appear here.
+            Notes you move to trash will appear here.
           </p>
 
         </div>
       )}
 
 
-      {/* ARCHIVED NOTES */}
+      {/* TRASHED NOTES */}
 
       {!loading && notes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -219,7 +219,7 @@ function ArchivePage() {
                   {note.title}
                 </h2>
 
-                <Archive
+                <Trash2
                   size={20}
                   className="text-gray-700 flex-shrink-0"
                 />
@@ -236,28 +236,37 @@ function ArchivePage() {
                 </span>
               )}
 
+              {note.createdAt && (
+                <p className="text-xs text-gray-600 mt-4">
+                  Added{" "}
+                  {new Date(
+                    note.createdAt
+                  ).toLocaleDateString()}
+                </p>
+              )}
+
               <div className="flex flex-col sm:flex-row gap-3 mt-6">
 
                 <button
                   type="button"
                   onClick={() =>
-                    unarchiveNote(note._id)
+                    restoreNote(note._id)
                   }
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition"
                 >
                   <RotateCcw size={18} />
-                  Unarchive
+                  Restore
                 </button>
 
                 <button
                   type="button"
                   onClick={() =>
-                    moveToTrash(note._id)
+                    deleteForever(note._id)
                   }
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
                 >
                   <Trash2 size={18} />
-                  Trash
+                  Delete Forever
                 </button>
 
               </div>
@@ -273,4 +282,4 @@ function ArchivePage() {
   );
 }
 
-export default ArchivePage;
+export default Trash;

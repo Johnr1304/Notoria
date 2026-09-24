@@ -11,6 +11,18 @@
       "name": "text12",
       "email": "text12@gmail.com",
       "password": "text12@12"
+    },
+    {
+      "name": "text",
+      "email": "text22@gmail.com",
+      "password": "text22@123",
+      "id": "Vbbvy54li-Q"
+    },
+    {
+      "name": "text",
+      "email": "text1@gmail.com",
+      "password": "text@12",
+      "id": "N0XotwfwlFg"
     }
   ],
   "notes": [
@@ -169,6 +181,42 @@
       "updatedAt": "7/16/2026, 8:13:13 PM",
       "userId": "h-dY1zRu5WY",
       "id": "3_p7iCTYKAU"
+    },
+    {
+      "title": "work",
+      "content": "need to learn react from today",
+      "tag": "imp 1",
+      "color": "#FBCFE8",
+      "pinned": false,
+      "archived": false,
+      "trashed": true,
+      "updatedAt": "7/16/2026, 8:49:57 PM",
+      "userId": "N0XotwfwlFg",
+      "id": "SjEVmZpK3Dk"
+    },
+    {
+      "title": "bfd",
+      "content": "rg",
+      "tag": "sfd",
+      "color": "#BFDBFE",
+      "pinned": false,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "7/16/2026, 8:50:11 PM",
+      "userId": "N0XotwfwlFg",
+      "id": "Bd1Bktf6TB0"
+    },
+    {
+      "title": "j75j",
+      "content": "jry",
+      "tag": "y5",
+      "color": "#FBCFE8",
+      "pinned": false,
+      "archived": false,
+      "trashed": false,
+      "updatedAt": "7/16/2026, 8:50:23 PM",
+      "userId": "N0XotwfwlFg",
+      "id": "MJNF3HF-TA0"
     }
   ],
   "notebooks": [],

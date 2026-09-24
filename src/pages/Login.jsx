@@ -20,39 +20,46 @@ function Login() {
     });
   };
 
+  // LOGIN
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.email || !formData.password) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  try {
-    const res = await api.get(`/users?email=${formData.email}`);
-
-    if (res.data.length === 0) {
-      alert("User not found");
+    if (!formData.email || !formData.password) {
+      alert("Please fill all fields");
       return;
     }
 
-    const user = res.data[0];
+    try {
+      const res = await api.post("/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-    if (user.password !== formData.password) {
-      alert("Invalid Password");
-      return;
+      // Save JWT token
+      localStorage.setItem("token", res.data.token);
+
+      // Save logged-in user
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify(res.data.user)
+      );
+
+      // Save login status
+      localStorage.setItem("isLoggedIn", "true");
+
+      alert(res.data.message || "Login successful");
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.log(err);
+
+      if (err.response) {
+        alert(err.response.data.message || "Login failed");
+      } else {
+        alert("Unable to connect to the server");
+      }
     }
-
-    localStorage.setItem("isLoggedIn", "true");
-
-    localStorage.setItem("currentUser", JSON.stringify(user));
-
-    navigate("/dashboard");
-  } catch (err) {
-    console.log(err);
-    alert("Login Failed");
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -133,6 +140,8 @@ function Login() {
               </button>
 
             </div>
+
+            {/* Login Button */}
 
             <button
               type="submit"

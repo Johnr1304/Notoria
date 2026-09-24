@@ -1,140 +1,221 @@
 import { useEffect, useState } from "react";
 import Masonry from "react-masonry-css";
-import api from "../services/api";
+import { Plus } from "lucide-react";
 
+import api from "../services/api";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import NoteCard from "../components/NoteCard";
 import NoteModal from "../components/NoteModal";
+import Footer from "../components/Footer";
 
 function Dashboard() {
   const [notes, setNotes] = useState([]);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
+
   const [collapsed, setCollapsed] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("currentUser") || "null");
-
-  useEffect(() => {
-    if (user) {
-      fetchNotes();
-    }
-  }, []);
-
+  // Fetch notes
   const fetchNotes = async () => {
     try {
-      const res = await api.get(
-        `/notes?userId=${user.id}&archived=false&trashed=false`,
+      const token = localStorage.getItem("token");
+
+      const res = await api.get("/notes", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setNotes(res.data.notes || []);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  // Add note
+  const handleAddNote = async (noteData) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await api.post("/notes", noteData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setNotes((prev) => [res.data.note, ...prev]);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error adding note:", error);
+    }
+  };
+
+  // Update note
+  const handleUpdateNote = async (noteData) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await api.put(
+        `/notes/${editingNote._id}`,
+        noteData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
-      setNotes(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const colors = [
-    "#C7D2FE", // Indigo
-    "#FBCFE8", // Pink
-    "#BBF7D0", // Green
-    "#FED7AA", // Orange
-    "#FDE68A", // Yellow
-    "#BFDBFE", // Blue
-    "#DDD6FE", // Purple
-    "#D1D5DB", // Gray
-  ];
-
-  const addNote = async (note) => {
-    try {
-      await api.post("/notes", {
-        ...note,
-        userId: user.id,
-        trashed: false,
-        color: colors[Math.floor(Math.random() * colors.length)],
-      });
-
-      await fetchNotes();
-
-      setShowModal(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const updateNote = async (updatedNote) => {
-    try {
-      await api.put(`/notes/${updatedNote.id}`, updatedNote);
-
-      await fetchNotes();
+      setNotes((prev) =>
+        prev.map((note) =>
+          note._id === editingNote._id ? res.data.note : note
+        )
+      );
 
       setEditingNote(null);
-
       setShowModal(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const deleteNote = async (id) => {
-    try {
-      const note = notes.find((n) => n.id === id);
-
-      await api.put(`/notes/${id}`, {
-        ...note,
-        trashed: true,
-      });
-
-      await fetchNotes();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const togglePin = async (note) => {
-    try {
-      await api.put(`/notes/${note.id}`, {
-        ...note,
-        pinned: !note.pinned,
-      });
-
-      await fetchNotes();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const archiveNote = async (note) => {
-    try {
-      await api.put(`/notes/${note.id}`, {
-        ...note,
-        archived: !note.archived,
-      });
-
-      await fetchNotes();
     } catch (error) {
-      console.log(error);
+      console.error("Error updating note:", error);
     }
   };
 
+  // Delete note - move to trash
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await api.put(
+        `/notes/${id}`,
+        {
+          trashed: true,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setNotes((prev) =>
+        prev.filter((note) => note._id !== id)
+      );
+
+      console.log("Note moved to trash:", res.data);
+    } catch (error) {
+      console.error("Error moving note to trash:", error);
+    }
+  };
+
+  // Pin / Unpin
+  const handlePin = async (note) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await api.put(
+        `/notes/${note._id}`,
+        {
+          pinned: !note.pinned,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setNotes((prev) =>
+        prev.map((item) =>
+          item._id === note._id ? res.data.note : item
+        )
+      );
+    } catch (error) {
+      console.error("Error pinning note:", error);
+    }
+  };
+
+  // Archive / Unarchive
+  const handleArchive = async (note) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await api.put(
+        `/notes/${note._id}`,
+        {
+          archived: !note.archived,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setNotes((prev) =>
+        prev.map((item) =>
+          item._id === note._id ? res.data.note : item
+        )
+      );
+    } catch (error) {
+      console.error("Error archiving note:", error);
+    }
+  };
+
+  // Open edit modal
+  const handleEdit = (note) => {
+    setEditingNote(note);
+    setShowModal(true);
+  };
+
+  // Open new note modal
+  const handleNewNote = () => {
+    setEditingNote(null);
+    setShowModal(true);
+  };
+
+  // Search
   const filteredNotes = notes.filter((note) => {
-    const query = search.toLowerCase();
+    if (note.trashed === true) {
+      return false;
+    }
+
+    const searchText = search.toLowerCase();
 
     return (
-      (note.title || "").toLowerCase().includes(query) ||
-      (note.content || "").toLowerCase().includes(query) ||
-      (note.tag || "").toLowerCase().includes(query)
+      note.title?.toLowerCase().includes(searchText) ||
+      note.content?.toLowerCase().includes(searchText) ||
+      note.tag?.toLowerCase().includes(searchText)
     );
   });
 
-  const totalNotes = notes.length;
+  // Statistics
+  const totalNotes = notes.filter(
+    (note) => note.trashed !== true
+  ).length;
 
-  const pinnedNotes = notes.filter((n) => n.pinned).length;
+  const pinnedNotes = notes.filter(
+    (note) =>
+      note.pinned === true &&
+      note.trashed !== true
+  ).length;
 
-  const archivedNotes = notes.filter((n) => n.archived).length;
+  const archivedNotes = notes.filter(
+    (note) =>
+      note.archived === true &&
+      note.trashed !== true
+  ).length;
 
-  const activeNotes = totalNotes - archivedNotes;
+  const activeNotes = notes.filter(
+    (note) =>
+      note.archived !== true &&
+      note.trashed !== true
+  ).length;
 
+  // Masonry responsive columns
   const breakpointColumnsObj = {
     default: 3,
     1100: 2,
@@ -142,177 +223,165 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-100 dark:bg-slate-900 transition-all duration-300">
+    <div className="flex min-h-screen w-full overflow-x-hidden bg-slate-100 dark:bg-slate-900 transition-all duration-300">
+
+      {/* Sidebar */}
       <Sidebar
         collapsed={collapsed}
         setCollapsed={setCollapsed}
-        onNewNote={() => {
-          setEditingNote(null);
-          setShowModal(true);
-        }}
+        onNewNote={handleNewNote}
       />
 
-      <div className="flex-1 flex flex-col dark:bg-slate-900">
-        <Navbar search={search} setSearch={setSearch} />
+      {/* Main content */}
+      <div className="flex-1 min-w-0 flex flex-col dark:bg-slate-900">
 
-        <main className="p-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-                Welcome Back 👋
+        {/* Navbar */}
+        <Navbar
+          search={search}
+          setSearch={setSearch}
+        />
+
+        {/* Dashboard content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                All Notes
               </h1>
 
-              <p className="text-gray-500 dark:text-gray-300 mt-2">
-                Organize your ideas smarter with Notoria.
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
+                Keep your thoughts organized and easy to find.
               </p>
             </div>
 
             <button
               type="button"
-              onClick={() => {
-                setEditingNote(null);
-                setShowModal(true);
-              }}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl"
+              onClick={handleNewNote}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition"
             >
-              + New Note
+              <Plus size={20} />
+              <span>New Note</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
-            <div
-              className="
-              bg-white
-              dark:bg-slate-800
-              rounded-2xl
-              p-6
-              border-l-4
-              border-indigo-600
-              shadow-sm
-              hover:shadow-xl
-              hover:-translate-y-1
-              transition-all
-              duration-300
-              cursor-pointer"
-            >
-              <h3 className="text-gray-500 dark:text-gray-300">Total Notes</h3>
+          {/* Statistics */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
 
-              <h1 className="text-5xl font-bold mt-3 text-indigo-600">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Total Notes
+              </p>
+
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                 {totalNotes}
-              </h1>
+              </h2>
             </div>
 
-            <div
-              className="
-bg-white
-dark:bg-slate-800
-rounded-2xl
-p-6
-border-l-4
-border-yellow-500
-shadow-sm
-hover:shadow-xl
-hover:-translate-y-1
-transition-all
-duration-300
-cursor-pointer"
-            >
-              <h3 className="text-gray-500 dark:text-gray-300">Pinned Notes</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Pinned
+              </p>
 
-              <h1 className="text-5xl font-bold mt-3 text-yellow-500">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                 {pinnedNotes}
-              </h1>
+              </h2>
             </div>
 
-            <div
-              className="
-bg-white
-dark:bg-slate-800
-rounded-2xl
-p-6
-border-l-4
-border-gray-500
-shadow-sm
-hover:shadow-xl
-hover:-translate-y-1
-transition-all
-duration-300
-cursor-pointer"
-            >
-              <h3 className="text-gray-500 dark:text-gray-300">
-                Archived Notes
-              </h3>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Archived
+              </p>
 
-              <h1 className="text-5xl font-bold mt-3 text-gray-600 dark:text-gray-300">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                 {archivedNotes}
-              </h1>
+              </h2>
             </div>
 
-            <div
-              className="
-bg-white
-dark:bg-slate-800
-rounded-2xl
-p-6
-border-l-4
-border-green-500
-shadow-sm
-hover:shadow-xl
-hover:-translate-y-1
-transition-all
-duration-300
-cursor-pointer"
-            >
-              <h3 className="text-gray-500 dark:text-gray-300">Active Notes</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Active
+              </p>
 
-              <h1 className="text-5xl font-bold mt-3 text-green-600">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                 {activeNotes}
-              </h1>
+              </h2>
             </div>
+
           </div>
 
-          <div className="mt-10">
-            {filteredNotes.length === 0 ? (
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-16 text-center shadow-lg">
-                <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
-                  No Notes Found
-                </h2>
-              </div>
-            ) : (
-              <Masonry
-                breakpointCols={breakpointColumnsObj}
-                className="flex gap-6"
-                columnClassName="space-y-6"
+          {/* Notes */}
+          {filteredNotes.length === 0 ? (
+
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 sm:p-12 text-center">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                No notes found
+              </h2>
+
+              <p className="text-gray-500 dark:text-gray-400 mt-2">
+                Create a new note to get started.
+              </p>
+
+              <button
+                type="button"
+                onClick={handleNewNote}
+                className="mt-5 inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition"
               >
-                {filteredNotes.map((note) => (
+                <Plus size={20} />
+                Create Note
+              </button>
+            </div>
+
+          ) : (
+
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="flex -ml-4 w-auto"
+              columnClassName="pl-4 bg-clip-padding"
+            >
+              {filteredNotes.map((note) => (
+                <div
+                  key={note._id}
+                  className="mb-4"
+                >
                   <NoteCard
-                    key={note.id}
                     note={note}
-                    onDelete={deleteNote}
-                    onPin={togglePin}
-                    onArchive={archiveNote}
-                    onEdit={() => {
-                      setEditingNote(note);
-                      setShowModal(true);
-                    }}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onPin={handlePin}
+                    onArchive={handleArchive}
                   />
-                ))}
-              </Masonry>
-            )}
-          </div>
+                </div>
+              ))}
+            </Masonry>
+
+          )}
+
         </main>
 
-        {showModal && (
-          <NoteModal
-            note={editingNote}
-            onClose={() => {
-              setShowModal(false);
-              setEditingNote(null);
-            }}
-            onSave={editingNote ? updateNote : addNote}
-          />
-        )}
+        {/* Footer */}
+        <Footer />
+
       </div>
+
+      {/* Note Modal */}
+      {showModal && (
+        <NoteModal
+          note={editingNote}
+          onClose={() => {
+            setShowModal(false);
+            setEditingNote(null);
+          }}
+          onSave={
+            editingNote
+              ? handleUpdateNote
+              : handleAddNote
+          }
+        />
+      )}
+
     </div>
   );
 }
